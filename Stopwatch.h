@@ -93,7 +93,8 @@ enum StopwatchMode {
 		Stopwatch::report_all();
 		@endcode
 		
-	Additionally one can provide the report* methods with a std::ostream (or subclass) to redirect the output (e.g. on a file).
+	Additionally one can provide the report* methods with a std::ostream (or subclass) to redirect the output (e.g. on a file). Four methods
+	are provided to get total, average, minimum and maximum execution times for a specific performance.
 		
 
 */
@@ -124,6 +125,27 @@ public:
 	/** Dump the data of all the performance records */
 	static void report_all(std::ostream& output = std::cout);
 
+	/** Returns total execution time of a certain performance */
+	static long double get_total_time(std::string perf_name);
+
+	/** Returns average execution time of a certain performance */
+	static long double get_average_time(std::string perf_name);
+
+	/** Returns minimum execution time of a certain performance */
+	static long double get_min_time(std::string perf_name);
+
+	/** Returns maximum execution time of a certain performance */
+	static long double get_max_time(std::string perf_name);
+
+	/**	Turn off clock, all the Stopwatch::* methods return without doing
+	  anything if this method is called. */
+	static void turn_off();
+	
+	/** Turn on clock, restore clock operativity after a turn_off(). */
+	static void turn_on();
+	
+private:
+
 	/** Struct to hold the performance data */
 	struct PerformanceData {
 	
@@ -141,15 +163,6 @@ public:
 		long double	max_time;
 		int	stops;
 	};
-
-	/**	Turn off clock, all the Stopwatch::* methods return without doing
-	  anything if this method is called. */
-	static void turn_off();
-	
-	/** Turn on clock, restore clock operativity after a turn_off(). */
-	static void turn_on();
-	
-private:
 
 	/** Take time, depends on mode */
 	static long double take_time();
