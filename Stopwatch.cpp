@@ -153,7 +153,7 @@ void Stopwatch::reset_all() {
 
 	map<string, PerformanceData>::iterator it;
 	
-	for (it = records_of->begin(); it != records_of->end(); it++) {
+	for (it = records_of->begin(); it != records_of->end(); ++it) {
 		reset(it->first);
 	}
 }
@@ -164,7 +164,7 @@ void Stopwatch::report_all(std::ostream& output) {
 
 	map<string, PerformanceData>::iterator it;
 	
-	for (it = records_of->begin(); it != records_of->end(); it++) {
+	for (it = records_of->begin(); it != records_of->end(); ++it) {
 		report(it->first, output);
 	}
 }
