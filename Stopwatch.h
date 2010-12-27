@@ -170,6 +170,9 @@ public:
 	/** Returns maximum execution time of a certain performance */
 	long double get_max_time(std::string perf_name);
 
+	/** Return last measurement of a certain performance */
+	long double get_last_time(std::string perf_name);
+
 	/**	Turn off clock, all the Stopwatch::* methods return without doing anything after this method is called. */
 	void turn_off();
 	
@@ -186,13 +189,30 @@ protected:
 			total_time(0),
 			min_time(0),
 			max_time(0),
+			last_time(0),
+			paused(false),
 			stops(0) {
 		}
 	
+		/** Start time */
 		long double	clock_start;
+
+		/** Cumulative total time */
 		long double	total_time;
+
+		/** Minimum time */
 		long double	min_time;
+
+		/** Maximum time */
 		long double	max_time;
+
+		/** Last time */
+		long double last_time;
+
+		/** Tells if this performance has been paused, only for internal use */
+		bool paused;
+
+		/** How many cycles have been this stopwatch executed? */
 		int	stops;
 	};
 

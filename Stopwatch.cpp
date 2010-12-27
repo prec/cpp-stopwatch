@@ -101,6 +101,12 @@ void Stopwatch::start(string perf_name)  {
 
 	// Take ctime
 	perf_info.clock_start = take_time();
+
+	// If this is a new start (i.e. not a restart)
+	if (!perf_info.paused)
+		perf_info.last_time = 0;
+
+	perf_info.paused = false;
 }
 
 void Stopwatch::stop(string perf_name) {
@@ -121,6 +127,9 @@ void Stopwatch::stop(string perf_name) {
 	if ( mode == CPU_TIME )
 		lapse /= (double) CLOCKS_PER_SEC;
 	
+	// Update last time
+	perf_info.last_time = lapse;
+
 	// Update min/max time
 	if ( lapse >= perf_info.max_time )	perf_info.max_time = lapse;
 	if ( lapse <= perf_info.min_time || perf_info.min_time == 0 )	perf_info.min_time = lapse;
@@ -144,6 +153,7 @@ void Stopwatch::pause(string perf_name) {
 	long double  lapse = clock_end - perf_info.clock_start;
 	
 	// Update total time
+	perf_info.last_time += lapse;
 	perf_info.total_time += lapse;
 }
 
@@ -183,6 +193,8 @@ void Stopwatch::reset(string perf_name) {
 	perf_info.total_time = 0;
 	perf_info.min_time = 0;
 	perf_info.max_time = 0;
+	perf_info.last_time = 0;
+	perf_info.paused = false;
 	perf_info.stops = 0;
 }
 
@@ -273,5 +285,17 @@ long double Stopwatch::get_max_time(string perf_name) {
 	PerformanceData& perf_info = records_of->find(perf_name)->second;
 
 	return perf_info.max_time;
+
+}
+
+long double Stopwatch::get_last_time(string perf_name) {
+
+	// Try to recover performance data
+	if ( !performance_exists(perf_name)  )
+		throw StopwatchException("Performance not initialized.");
+
+	PerformanceData& perf_info = records_of->find(perf_name)->second;
+
+	return perf_info.last_time;
 
 }
