@@ -41,110 +41,139 @@ enum StopwatchMode {
 };
 
 /** 
-	@brief A static class representing a stopwatch.
-	
-	The Stopwatch class can be used to profile code performance. Basically one wraps the code to be measured using two method calls:
+	@brief A class representing a stopwatch.
+
+		@code
+		Stopwatch swatch();
+		@endcode
+
+	The Stopwatch class can be used to measure execution time of code, algorithms, etc., the Stopwatch can
+	be initialized in two time-taking modes, CPU time and real time:
 	
 		@code
-		Stopwatch::start("Piece of code ID");
+		watch.set_mode(REAL_TIME);
+		@endcode
+
+	CPU time is the time spent by the processor on a certain piece of code, while real time is the real
+	amount of time taken by a certain piece of code to execute (i.e. in general if you are doing hard work
+	such as image or video editing on a different process the measured time will probably increase).
+	
+	How does it work? Basically, one wraps the code to be measured with the following method calls:
+	
+		@code
+		swatch.start("My astounding algorithm");
 		// Hic est code
-		Stopwatch::stop("Piece of code ID");
+		swatch.stop("My astounding algorithm");
 		@endcode
 		
 	A string representing the code ID is provided so that nested portions of code can be profiled separately:
 	
 		@code
-		Stopwatch::start("Algorithm 1");
+		swatch.start("My astounding algorithm");
 		
-		// Init
+		swatch.start("My astounding algorithm - Super smart init");
+		// Initialization
+		swatch.stop("My astounding algorithm - Super smart init");
 		
-		Stopwatch::start("Algorithm 1 - Loop");
+		swatch.start("My astounding algorithm - Main loop");
 		// Loop
-		Stopwatch::stop("Algorithm 1 - Loop");
+		swatch.stop("My astounding algorithm - Main loop");
 		
-		Stopwatch::stop("Algorithm 1");
+		swatch.stop("My astounding algorithm");
 		@endcode
+
+	Note: ID strings can be whatever you like, in the previous example I have used "My astounding algorithm - *"
+	only to enforce the fact that the measured code portions are part of My astounding algorithm, but there's no
+	connection between the three measurements.
 		
-	If the code for a certain task is scattered through different files or portions of the same file one can use the start-pause-stop method:
+	If the code for a certain task is scattered through different files or portions of the same file one can use 
+	the start-pause-stop method:
 	
 		@code
-		Stopwatch::start("Setup");
+		swatch.start("Setup");
 		// First part of setup
-		Stopwatch::pause("Setup");
+		swatch.pause("Setup");
 		
-		Stopwatch::start("Main logic");
+		swatch.start("Main logic");
 		// Main logic
-		Stopwatch::stop("Main logic");
+		swatch.stop("Main logic");
 		
-		Stopwatch::start("Setup");
-		// Cleanup
-		Stopwatch::stop("Setup");
+		swatch.start("Setup");
+		// Cleanup (part of the setup)
+		swatch.stop("Setup");
 		@endcode
 		
 	Finally, to report the results of the measurements just run:
 	
 		@code
-		Stopwatch::report("Code ID");
+		swatch.report("Code ID");
 		@endcode
+
+	Thou can also provide an additional std::ostream& parameter to report() to redirect the logging on a different
+	output. Also, you can use the get_total/min/max/average_time() methods to get the individual numeric data, without
+	all the details of the logging. You can also extend Stopwatch to implement your own logging syntax.
 		
-	or, to report all the measurements:
+	To report all the measurements:
 	
 		@code
-		Stopwatch::report_all();
+		swatch.report_all();
 		@endcode
-		
-	Additionally one can provide the report* methods with a std::ostream (or subclass) to redirect the output (e.g. on a file). Four methods
-	are provided to get total, average, minimum and maximum execution times for a specific performance.
-		
+
+	Same as above, you can redirect the output by providing a std::ostream& parameter.		
 
 */
 class Stopwatch {
 public:
 	
+	/** Constructor */
+	Stopwatch();
+
+	/** Destructor */
+	~Stopwatch();
+
 	/** Initialize stopwatch to use a certain time taking mode */
-	static void init(StopwatchMode mode);
+	void set_mode(StopwatchMode mode);
 
 	/** Start the stopwatch related to a certain piece of code */
-	static void start(std::string perf_name);
+	void start(std::string perf_name);
 		
 	/** Stops the stopwatch related to a certain piece of code */
-	static void stop(std::string perf_name);
+	void stop(std::string perf_name);
 	
 	/** Stops the stopwatch related to a certain piece of code */
-	static void pause(std::string perf_name);
+	void pause(std::string perf_name);
 
 	/** Reset a certain performance record */
-	static void reset(std::string perf_name);
+	void reset(std::string perf_name);
 		
 	/** Resets all the performance records */
-	static void reset_all();
+	void reset_all();
 	
 	/** Dump the data of a certain performance record */
-	static void report(std::string perf_name, std::ostream& output = std::cout);
+	void report(std::string perf_name, std::ostream& output = std::cout);
 
 	/** Dump the data of all the performance records */
-	static void report_all(std::ostream& output = std::cout);
+	void report_all(std::ostream& output = std::cout);
 
 	/** Returns total execution time of a certain performance */
-	static long double get_total_time(std::string perf_name);
+	long double get_total_time(std::string perf_name);
 
 	/** Returns average execution time of a certain performance */
-	static long double get_average_time(std::string perf_name);
+	long double get_average_time(std::string perf_name);
 
 	/** Returns minimum execution time of a certain performance */
-	static long double get_min_time(std::string perf_name);
+	long double get_min_time(std::string perf_name);
 
 	/** Returns maximum execution time of a certain performance */
-	static long double get_max_time(std::string perf_name);
+	long double get_max_time(std::string perf_name);
 
-	/**	Turn off clock, all the Stopwatch::* methods return without doing
-	  anything if this method is called. */
-	static void turn_off();
+	/**	Turn off clock, all the Stopwatch::* methods return without doing anything after this method is called. */
+	void turn_off();
 	
 	/** Turn on clock, restore clock operativity after a turn_off(). */
-	static void turn_on();
+	void turn_on();
 	
-private:
+protected:
 
 	/** Struct to hold the performance data */
 	struct PerformanceData {
@@ -165,16 +194,16 @@ private:
 	};
 
 	/** Take time, depends on mode */
-	static long double take_time();
+	long double take_time();
 
 	/** Time taking mode */
-	static StopwatchMode mode;
+	StopwatchMode mode;
 
 	/** Pointer to the dynamic structure which holds the collection of performance data */
-	static std::map<std::string, PerformanceData >* records_of;
+	std::map<std::string, PerformanceData >* records_of;
 	
 	/** Flag to hold the clock's status */
-	static bool active;
+	bool active;
 };
 
 #ifndef WIN32
