@@ -30,26 +30,18 @@ using std::map;
 using std::string;
 using std::ostringstream;
 
-// Initialize singleton pointer
-map<string, Stopwatch::PerformanceData >* Stopwatch::records_of = new map<string, Stopwatch::PerformanceData >();
+Stopwatch::Stopwatch() : active(true), mode(NONE)  {
+	records_of = new map<string, PerformanceData>();
+}
 
-// Activate clock
-bool Stopwatch::active = true;
+Stopwatch::~Stopwatch() {
+	delete records_of;
+}
 
-// Set stopwatch mode to none, force user to decide how to take times
-StopwatchMode Stopwatch::mode = NONE;
-
-// Initialize clock with a mode, if done between a start and a stop, results will be wrong
-void Stopwatch::init(StopwatchMode new_mode) {
-	/*
-	if (mode != NONE)
-		return;
-	else
-	*/
+void Stopwatch::set_mode(StopwatchMode new_mode) {
 	mode = new_mode;
 }
 
-// Take time, depends on mode
 long double Stopwatch::take_time() {
 
 	if ( mode == CPU_TIME ) {
@@ -94,7 +86,6 @@ long double Stopwatch::take_time() {
 	}
 }
 
-// Start the counting
 void Stopwatch::start(string perf_name)  {
 
 	if (!active) return;
@@ -108,7 +99,6 @@ void Stopwatch::start(string perf_name)  {
 	perf_info.clock_start = take_time();
 }
 
-// Stops the counting
 void Stopwatch::stop(string perf_name) {
 	
 	if (!active) return;
@@ -135,7 +125,6 @@ void Stopwatch::stop(string perf_name) {
 	perf_info.total_time += lapse;
 }
 
-// Stops the counting
 void Stopwatch::pause(string perf_name) {
 	
 	if (!active) return;
@@ -154,7 +143,6 @@ void Stopwatch::pause(string perf_name) {
 	perf_info.total_time += lapse;
 }
 
-// Reset all performance records
 void Stopwatch::reset_all() {
 	
 	if (!active) return;
@@ -166,7 +154,6 @@ void Stopwatch::reset_all() {
 	}
 }
 
-// Report all data
 void Stopwatch::report_all(std::ostream& output) {
 
 	if (!active) return;
@@ -178,7 +165,6 @@ void Stopwatch::report_all(std::ostream& output) {
 	}
 }
 
-// Reset the stopwatch
 void Stopwatch::reset(string perf_name) {
 
 	if (!active) return;
