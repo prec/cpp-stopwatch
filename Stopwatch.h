@@ -51,7 +51,7 @@ enum StopwatchMode {
 	be initialized in two time-taking modes, CPU time and real time:
 	
 		@code
-		watch.set_mode(REAL_TIME);
+		swatch.set_mode(REAL_TIME);
 		@endcode
 
 	CPU time is the time spent by the processor on a certain piece of code, while real time is the real
@@ -130,6 +130,9 @@ public:
 
 	/** Destructor */
 	~Stopwatch();
+
+	/** Tells if a performance with a certain ID exists */
+	bool performance_exists(std::string perf_name);
 
 	/** Initialize stopwatch to use a certain time taking mode */
 	void set_mode(StopwatchMode mode);
